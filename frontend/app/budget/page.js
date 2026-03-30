@@ -6,7 +6,16 @@ import { useAuth } from '@/lib/auth';
 import { formatCurrency, getMonthName, capitalize } from '@/lib/utils';
 import { Button, Modal, Input, Select, Textarea, Alert, EmptyState, Badge } from '@/components/ui';
 import { Plus, Pencil, Trash2, AlertTriangle, CheckCircle, PiggyBank, ChevronLeft, ChevronRight } from 'lucide-react';
+const pluralize = (count, word) => {
+  if (count === 1) return `${count} ${word}`;
 
+  // handle words ending with 'y'
+  if (word.endsWith('y')) {
+    return `${count} ${word.slice(0, -1)}ies`;
+  }
+
+  return `${count} ${word}s`;
+};
 const CATEGORIES = [
   'food','events','maintenance','equipment','travel',
   'utilities','salaries','marketing','donations','membership','grants','sponsorship','other',
@@ -247,8 +256,16 @@ export default function BudgetPage() {
           {[
             { label: 'Total Planned', value: formatCurrency(totalPlanned), color: 'text-surface-800' },
             { label: 'Total Spent',   value: formatCurrency(totalActual),  color: totalActual > totalPlanned ? 'text-red-600' : 'text-surface-800' },
-            { label: 'Exceeded',      value: `${exceededCount} category${exceededCount !== 1 ? 's' : ''}`, color: exceededCount > 0 ? 'text-red-600' : 'text-surface-800' },
-            { label: 'Near Limit',    value: `${alertedCount} category${alertedCount !== 1 ? 's' : ''}`,  color: alertedCount > 0 ? 'text-amber-600' : 'text-surface-800' },
+            { 
+              label: 'Exceeded',
+              value: pluralize(exceededCount, 'category'),
+              color: exceededCount > 0 ? 'text-red-600' : 'text-surface-800'
+            },
+            { 
+              label: 'Near Limit',
+              value: pluralize(alertedCount, 'category'),
+              color: alertedCount > 0 ? 'text-amber-600' : 'text-surface-800'
+            },
           ].map(({ label, value, color }) => (
             <div key={label} className="card p-4 text-center">
               <p className="text-xs text-surface-500 mb-1">{label}</p>
